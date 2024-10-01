@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "Meridian Market"
+version = "0.1.0"
+description = "Онлайн платформа-торгойо сети электроники Meridian Market"
+authors = ["Никита Шидогубов <nikita@mer1d1an.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+python-dotenv = "^1.0.1"
+psycopg2-binary = "^2.9.9"
+django = "^5.1.1"
+django-filter = "^24.3"
+djangorestframework = "^3.15.2"
+drf-yasg = "^1.21.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
