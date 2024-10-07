@@ -1,22 +1,37 @@
-"""
-URL configuration for config project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.contrib.auth.views import LogoutView
+from django.urls import path, include
+from django.views.generic import View
+from drf_yasg import openapi
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="API для управления онлайн платформой торговой сети электроники Meridian Market",
+        default_version="v0.01",
+        description="""
+        API онлайн платформы торговой сети электроники Meridian Market.
+        """,
+        contact=openapi.Contact(email="nikita@mer1d1an.ru"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
+
+# Вьюха, которая принудительно делает POST-запрос для логаута
+class ForcePostLogoutView(View):
+    def get(self, request, *args, **kwargs):
+        # Создаем POST-запрос для логаута
+        return LogoutView.as_view(next_page="/docs/")(request)
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("", include("network.urls")),
+    path("docs/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger"),
+    path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="redoc"),
+    # Перенаправляем GET-запрос на логаут, чтобы выполнялся POST-запрос
+    path("accounts/logout/", ForcePostLogoutView.as_view()),
 ]

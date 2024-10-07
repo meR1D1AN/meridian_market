@@ -10,7 +10,7 @@ load_dotenv(dotenv_path=dot_env)
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG") == "True"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS")
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Приложения проекта
     "users",
+    "network",
     # Сторонние библиотеки
     "rest_framework",
     "django_filters",
@@ -89,6 +90,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = "ru-ru"
 TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
+USE_L10N = True
 USE_TZ = True
 
 
@@ -102,17 +104,24 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # Django REST Framework настройки
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.IsAuthenticated",  # Ограничиваем доступ к API для неактивных пользователей
+    ],
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",  # Поддержка фильтрации в API
     ],
 }
 
-#  Отключает кнопку "Django Login"
+
+# Swagger настройки
 SWAGGER_SETTINGS = {
-    "USE_SESSION_AUTH": False,
     "OPERATIONS_SORTER": "alpha",
     "TAGS_SORTER": "alpha",  # Сортировка тегов по алфавиту
 }
+
+
+# Указываем, что будет использоваться наша модель User
+AUTH_USER_MODEL = "users.User"
+
+LOGIN_URL = "admin:login"
+LOGOUT_REDIRECT_URL = "admin:login"  # После выхода перенаправляем на Swagger
