@@ -20,7 +20,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # Приложения проекта
-    "users",
     "network",
     # Сторонние библиотеки
     "rest_framework",
@@ -120,8 +119,4 @@ SWAGGER_SETTINGS = {
 }
 
 
-# Указываем, что будет использоваться наша модель User
-AUTH_USER_MODEL = "users.User"
-
 LOGIN_URL = "admin:login"
-LOGOUT_REDIRECT_URL = "admin:login"  # После выхода перенаправляем на Swagger
