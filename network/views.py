@@ -112,6 +112,6 @@ class NodeViewSet(viewsets.ModelViewSet):
 
 
 class SupplierViewSet(viewsets.ModelViewSet):
-    queryset = Node.objects.filter(type=Node.FACTORY)  # Например, поставщики — это заводы
+    queryset = Node.objects.all()
     serializer_class = SupplierSerializer
     permission_classes = [IsAuthenticated]
