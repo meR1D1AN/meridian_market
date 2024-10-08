@@ -67,6 +67,7 @@ class Node(models.Model):
     name = models.CharField(
         max_length=255, verbose_name="Название", help_text="Укажите название"
     )
+    # Контакты
     contact = models.ForeignKey(
         Contact,
         on_delete=models.CASCADE,
