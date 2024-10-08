@@ -1,8 +1,12 @@
-import django_filters
+from django_filters import rest_framework as filters
 from .models import Node
 
 
-class NetworkNodeFilter(django_filters.FilterSet):
+class NodeFilter(filters.FilterSet):
+    country = filters.CharFilter(field_name="contact__country")
+    city = filters.CharFilter(field_name="contact__city")
+
     class Meta:
         model = Node
-        fields = ["country", "city"]  # Фильтрация по стране и городу
+        fields = ["country", "city", "type"]
+

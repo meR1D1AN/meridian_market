@@ -4,6 +4,54 @@ from django.urls import reverse
 NULLABLE = {"null": True, "blank": True}
 
 
+class Contact(models.Model):
+    email = models.EmailField(
+        verbose_name="Электронная почта", help_text="Укажите почту", unique=True
+    )
+    country = models.CharField(
+        max_length=100, verbose_name="Страна", help_text="Укажите страну"
+    )
+    city = models.CharField(
+        max_length=100, verbose_name="Город", help_text="Укажите город"
+    )
+    street = models.CharField(
+        max_length=100, verbose_name="Улица", help_text="Укажите улица"
+    )
+    building_number = models.CharField(
+        max_length=10, verbose_name="Номер дома", help_text="Укажите номер дома"
+    )
+
+    def __str__(self):
+        return self.email
+
+    class Meta:
+        verbose_name = "Контакт"
+        verbose_name_plural = "Контакты"
+
+
+class Product(models.Model):
+    product_name = models.CharField(
+        max_length=255,
+        verbose_name="Название продукта",
+        help_text="Укажите название продукта",
+    )
+    product_model = models.CharField(
+        max_length=255,
+        verbose_name="Модель продукта",
+        help_text="Укажите модель продукта",
+    )
+    release_date = models.DateField(
+        verbose_name="Дата выпуска", help_text="Укажите дату выпуска"
+    )
+
+    def __str__(self):
+        return self.product_name
+
+    class Meta:
+        verbose_name = "Продукт"
+        verbose_name_plural = "Продукты"
+
+
 class Node(models.Model):
     FACTORY = "factory"
     RETAIL_NETWORK = "retail_network"
@@ -18,35 +66,21 @@ class Node(models.Model):
     name = models.CharField(
         max_length=255, verbose_name="Название", help_text="Укажите название"
     )
-    # Контакты
-    email = models.EmailField(
-        verbose_name="Электронная почта", help_text="Укажите почту"
-    )
-    country = models.CharField(
-        max_length=100, verbose_name="Страна", help_text="Укажите страну"
-    )
-    city = models.CharField(
-        max_length=100, verbose_name="Город", help_text="Укажите город"
-    )
-    street = models.CharField(
-        max_length=100, verbose_name="Улица", help_text="Укажите улица"
-    )
-    building_number = models.CharField(
-        max_length=10, verbose_name="Номер дома", help_text="Укажите номер дома"
+    contact = models.ForeignKey(
+        Contact,
+        on_delete=models.CASCADE,
+        verbose_name="Контакты",
+        help_text="Укажите контакты данные",
+        related_name="nodes",
+        **NULLABLE,
     )
     # Продукты
-    product_name = models.CharField(
-        max_length=255,
-        verbose_name="Название продукта",
-        help_text="Укажите Название продукта",
-    )
-    product_model = models.CharField(
-        max_length=100,
-        verbose_name="Модель продукта",
-        help_text="Укажите модель продукта",
-    )
-    release_date = models.DateField(
-        verbose_name="Дата выхода на рынок", help_text="Укажите дату выхода на рынок"
+    product = models.ManyToManyField(
+        Product,
+        verbose_name="Продукты",
+        help_text="Укажите продукт",
+        related_name="nodes",
+        blank=True,
     )
     # Поставщик
     supplier = models.ForeignKey(
@@ -67,7 +101,7 @@ class Node(models.Model):
     )
     # Дата и время создания
     created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name="Дата создания и время создания"
+        auto_now_add=True, verbose_name="Дата и время создания"
     )
     # Уровень структуры
     type = models.CharField(
@@ -83,7 +117,12 @@ class Node(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.get_type_display()})"
 
     def get_admin_url(self):
         return reverse("admin:network_node_change", args=[self.id])
+
+    def save(self, *args, **kwargs):
+        if self.debt_to_supplier < 0:
+            raise ValueError("Задолженность не может быть отрицательной.")
+        super().save(*args, **kwargs)

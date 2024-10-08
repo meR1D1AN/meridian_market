@@ -111,12 +111,10 @@ REST_FRAMEWORK = {
     ],
 }
 
-
 # Swagger настройки
 SWAGGER_SETTINGS = {
     "OPERATIONS_SORTER": "alpha",
     "TAGS_SORTER": "alpha",  # Сортировка тегов по алфавиту
 }
-
 
 LOGIN_URL = "admin:login"

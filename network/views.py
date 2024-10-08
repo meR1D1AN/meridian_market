@@ -3,6 +3,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+
+from .filters import NodeFilter
 from .models import Node
 from .serializers import NodeSerializer
 from .serializers import SupplierSerializer
@@ -13,7 +15,8 @@ class NodeViewSet(viewsets.ModelViewSet):
     serializer_class = NodeSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["country"]
+    filter_class = NodeFilter
+    filterset_fields = ["contact__country"]
 
     @swagger_auto_schema(
         operation_description="Получить список всех тоговых сетей",
@@ -195,6 +198,5 @@ class SupplierViewSet(viewsets.ModelViewSet):
         responses={200: openapi.Response("OK", SupplierSerializer())},
         tags=["Поставщики"],
     )
-
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
