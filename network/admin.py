@@ -49,4 +49,4 @@ class NodeAdmin(admin.ModelAdmin):
     def get_product(self, obj):
         return ", ".join([product.product_name for product in obj.product.all()])
 
-    get_product.short_description = "Контактная информация"
+    get_product.short_description = "Продукт"

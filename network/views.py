@@ -1,6 +1,7 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -21,7 +22,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Получить список всех тоговых сетей",
         responses={200: openapi.Response("OK", NodeSerializer(many=True))},
-        tags=["Торговые сети"],
+        tags=["1. Торговые сети"],
         manual_parameters=[
             openapi.Parameter(
                 "country",
@@ -40,7 +41,7 @@ class NodeViewSet(viewsets.ModelViewSet):
         Создание новой торговой сети
         """,
         responses={200: openapi.Response("OK", NodeSerializer())},
-        tags=["Торговые сети"],
+        tags=["1. Торговые сети"],
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
@@ -48,7 +49,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Получить информацию о торговой сети",
         responses={200: NodeSerializer},
-        tags=["Торговые сети"],
+        tags=["1. Торговые сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -64,7 +65,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Обновить информацию о торговой сети",
         responses={200: NodeSerializer},
-        tags=["Торговые сети"],
+        tags=["1. Торговые сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -80,7 +81,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Частичное обновление информации о торговой сети",
         responses={200: NodeSerializer},
-        tags=["Торговые сети"],
+        tags=["1. Торговые сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -96,7 +97,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Удалить тоговую сеть",
         responses={204: None},
-        tags=["Торговые сети"],
+        tags=["1. Торговые сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -110,7 +111,10 @@ class NodeViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
     def perform_update(self, serializer):
-        # Запрещаем обновление поля debt_to_supplier через API
+        # Проверяем, пытается ли пользователь обновить поле debt_to_supplier
+        if "debt_to_supplier" in serializer.validated_data:
+            raise ValidationError("Обновление поля 'debt_to_supplier' запрещено.")
+        # Если поле не обновляется, продолжаем обновление
         serializer.save(debt_to_supplier=self.get_object().debt_to_supplier)
 
 
@@ -122,7 +126,7 @@ class SupplierViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Получить список всех поставщиков",
         responses={200: openapi.Response("OK", SupplierSerializer(many=True))},
-        tags=["Поставщики"],
+        tags=["2.Поставщики"],
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -130,7 +134,7 @@ class SupplierViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Получить информацию о поставщике",
         responses={200: SupplierSerializer},
-        tags=["Поставщики"],
+        tags=["2.Поставщики"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -146,7 +150,7 @@ class SupplierViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Обновить информацию о поставщике",
         responses={200: SupplierSerializer},
-        tags=["Поставщики"],
+        tags=["2.Поставщики"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -162,7 +166,7 @@ class SupplierViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Частичное обновление информации о поставщике",
         responses={200: SupplierSerializer},
-        tags=["Поставщики"],
+        tags=["2.Поставщики"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -178,7 +182,7 @@ class SupplierViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Удалить поставщика",
         responses={204: None},
-        tags=["Поставщики"],
+        tags=["2.Поставщики"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -196,7 +200,7 @@ class SupplierViewSet(viewsets.ModelViewSet):
         Создание нового поставщика
         """,
         responses={200: openapi.Response("OK", SupplierSerializer())},
-        tags=["Поставщики"],
+        tags=["2.Поставщики"],
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)

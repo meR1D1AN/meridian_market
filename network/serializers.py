@@ -18,7 +18,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
 # Сериализатор для поставщика (отдельный)
 class SupplierSerializer(serializers.ModelSerializer):
-    contact = ContactSerializer(read_only=True)  # Контактная информация для поставщика
+    contact = ContactSerializer(read_only=True)
+    product = ProductSerializer(many=True, read_only=True)
+    # supplier = (read_only=True)
 
     class Meta:
         model = Node
@@ -27,29 +29,36 @@ class SupplierSerializer(serializers.ModelSerializer):
             "name",
             "type",
             "contact",
-        ]  # Выводим только нужные поля (без debt_to_supplier)
-
-
-# Основной сериализатор для модели Node
-class NodeSerializer(serializers.ModelSerializer):
-    products = ProductSerializer(
-        many=True, read_only=True
-    )  # Продукты как вложенные объекты
-    contact = ContactSerializer(read_only=True)  # Контакты как вложенные объекты
-    supplier = SupplierSerializer(
-        read_only=True
-    )  # Поставщик через отдельный сериализатор
-
-    class Meta:
-        model = Node
-        fields = [
-            "id",
-            "name",
-            "type",
-            "contact",
-            "products",
+            "product",
             "supplier",
             "debt_to_supplier",
             "created_at",
         ]
-        read_only_fields = ["debt_to_supplier"]
+
+
+# Основной сериализатор для модели Node
+class NodeSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(many=True, read_only=True)
+    supplier = SupplierSerializer(read_only=True)
+    contact = ContactSerializer(read_only=True)
+
+    class Meta:
+        model = Node
+        fields = [
+            "id",
+            "name",
+            "type",
+            "contact",
+            "supplier",
+            "product",
+            "debt_to_supplier",
+            "created_at",
+        ]
+        extra_kwargs = {
+            "debt_to_supplier": {"read_only": False}  # Поле доступно для создания
+        }
+
+    # Переопределяем метод update, чтобы запретить обновление debt_to_supplier
+    def update(self, instance, validated_data):
+        validated_data.pop("debt_to_supplier", None)  # Убираем поле при обновлении
+        return super().update(instance, validated_data)
