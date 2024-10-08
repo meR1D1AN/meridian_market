@@ -19,10 +19,10 @@ Meridian Market — это онлайн-платформа для управле
 
 ## Требования
 
-- Python 3.8+
-- Django 3+
-- DRF 3.10+
-- PostgreSQL 10+
+- Python 3.12.6
+- Django 5.1.1
+- DRF 3.15.2
+- PostgreSQL 17
 
 ## Установка
 
