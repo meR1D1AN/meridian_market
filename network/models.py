@@ -96,7 +96,7 @@ class Node(models.Model):
         max_digits=10,
         decimal_places=2,
         verbose_name="Задолженность",
-        help_text="Укажите задолженность, с точносью до копеек",
+        help_text="Укажите задолженность, с точностью до копеек",
         default=0.00,
     )
     # Дата и время создания
