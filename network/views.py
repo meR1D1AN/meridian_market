@@ -115,3 +115,86 @@ class SupplierViewSet(viewsets.ModelViewSet):
     queryset = Node.objects.all()
     serializer_class = SupplierSerializer
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="Получить список всех поставщиков",
+        responses={200: openapi.Response("OK", SupplierSerializer(many=True))},
+        tags=["Поставщики"],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Получить информацию о поставщике",
+        responses={200: SupplierSerializer},
+        tags=["Поставщики"],
+        manual_parameters=[
+            openapi.Parameter(
+                name="id",
+                in_=openapi.IN_PATH,
+                type=openapi.TYPE_INTEGER,
+                description="Укажите ID поставщика",
+            )
+        ],
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Обновить информацию о поставщике",
+        responses={200: SupplierSerializer},
+        tags=["Поставщики"],
+        manual_parameters=[
+            openapi.Parameter(
+                name="id",
+                in_=openapi.IN_PATH,
+                type=openapi.TYPE_INTEGER,
+                description="Укажите ID поставщика",
+            )
+        ],
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Частичное обновление информации о поставщике",
+        responses={200: SupplierSerializer},
+        tags=["Поставщики"],
+        manual_parameters=[
+            openapi.Parameter(
+                name="id",
+                in_=openapi.IN_PATH,
+                type=openapi.TYPE_INTEGER,
+                description="Укажите ID поставщика",
+            )
+        ],
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Удалить поставщика",
+        responses={204: None},
+        tags=["Поставщики"],
+        manual_parameters=[
+            openapi.Parameter(
+                name="id",
+                in_=openapi.IN_PATH,
+                type=openapi.TYPE_INTEGER,
+                description="Укажите ID поставщика",
+            )
+        ],
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="""
+        Создание нового поставщика
+        """,
+        responses={200: openapi.Response("OK", SupplierSerializer())},
+        tags=["Поставщики"],
+    )
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
