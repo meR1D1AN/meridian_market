@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Node
 from .serializers import NodeSerializer
+from .serializers import SupplierSerializer
 
 
 class NodeViewSet(viewsets.ModelViewSet):
@@ -108,3 +109,9 @@ class NodeViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         # Запрещаем обновление поля debt_to_supplier через API
         serializer.save(debt_to_supplier=self.get_object().debt_to_supplier)
+
+
+class SupplierViewSet(viewsets.ModelViewSet):
+    queryset = Node.objects.filter(type=Node.FACTORY)  # Например, поставщики — это заводы
+    serializer_class = SupplierSerializer
+    permission_classes = [IsAuthenticated]
