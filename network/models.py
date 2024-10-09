@@ -182,6 +182,3 @@ class Node(BaseClass):
 
     def __str__(self):
         return f"{self.name} ({self.get_type_display()})"
-
-    def get_admin_url(self):
-        return reverse("admin:network_supplier_node_change", args=[self.id])
