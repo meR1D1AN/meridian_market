@@ -73,7 +73,7 @@ class BaseClass(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Контакты",
         help_text="Укажите контакты данные",
-        related_name="nodes",
+        related_name="%(class)s_contacts",
         **NULLABLE,
     )
     # Продукты
@@ -81,7 +81,7 @@ class BaseClass(models.Model):
         Product,
         verbose_name="Продукты",
         help_text="Укажите продукт",
-        related_name="nodes",
+        related_name="%(class)s_products",
         blank=True,
     )
     # Задолженность перед поставщиком
@@ -94,7 +94,9 @@ class BaseClass(models.Model):
     )
     # Дата и время создания
     created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name="Дата и время создания"
+        auto_now_add=True,
+        verbose_name="Дата и время создания",
+        **NULLABLE,
     )
     # Уровень структуры
     type = models.CharField(
@@ -103,6 +105,39 @@ class BaseClass(models.Model):
         verbose_name="Структура",
         help_text="Выберите структуру",
     )
+
+    def __str__(self):
+        return f"{self.name} - ({self.get_type_display()})"
+
+    # Метод для вычисления уровня
+    def get_hierarchy_level(self):
+        level = 0
+        supplier = getattr(self, "supplier_node", None) or getattr(
+            self, "supplier_parent", None
+        )
+        while supplier:
+            level += 1
+            supplier = getattr(supplier, "supplier_node", None) or getattr(
+                supplier, "supplier_parent", None
+            )
+        return level
+
+    def save(self, *args, **kwargs):
+        if self.debt_to_supplier < 0:
+            raise ValueError("Задолженность не может быть отрицательной.")
+
+        # Проверяем наличие поставщика, но учитываем обе возможные модели: Supplier и Node
+        supplier_field = getattr(self, "supplier_node", None) or getattr(
+            self, "supplier_parent", None
+        )
+
+        if (
+            supplier_field
+            and not Supplier.objects.filter(id=supplier_field.id).exists()
+        ):
+            raise ValueError("Выбранный поставщик не существует.")
+
+        super().save(*args, **kwargs)
 
 
 class Supplier(BaseClass):
@@ -150,13 +185,3 @@ class Node(BaseClass):
 
     def get_admin_url(self):
         return reverse("admin:network_supplier_node_change", args=[self.id])
-
-    def save(self, *args, **kwargs):
-        if self.debt_to_supplier < 0:
-            raise ValueError("Задолженность не может быть отрицательной.")
-        elif (
-            self.supplier_node
-            and not Supplier.objects.filter(id=self.supplier_node.id).exists()
-        ):
-            raise ValueError("Выбранный поставщик не существует.")
-        super().save(*args, **kwargs)

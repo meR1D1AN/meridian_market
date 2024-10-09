@@ -6,9 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .filters import NodeFilter
-from .models import Node
+from .models import Node, Supplier
 from .serializers import NodeSerializer
-from .serializers import SupplierSerializer
+from .serializers import SupplierSerializer, SupplierUpdateSerializer
 
 
 class NodeViewSet(viewsets.ModelViewSet):
@@ -119,9 +119,13 @@ class NodeViewSet(viewsets.ModelViewSet):
 
 
 class SupplierViewSet(viewsets.ModelViewSet):
-    queryset = Node.objects.all()
-    serializer_class = SupplierSerializer
+    queryset = Supplier.objects.all()
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action in ['update', 'partial_update']:
+            return SupplierUpdateSerializer  # Для обновления
+        return SupplierSerializer
 
     @swagger_auto_schema(
         operation_description="Получить список всех поставщиков",
@@ -149,7 +153,7 @@ class SupplierViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         operation_description="Обновить информацию о поставщике",
-        responses={200: SupplierSerializer},
+        responses={200: SupplierUpdateSerializer},
         tags=["2.Поставщики"],
         manual_parameters=[
             openapi.Parameter(
@@ -165,7 +169,7 @@ class SupplierViewSet(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         operation_description="Частичное обновление информации о поставщике",
-        responses={200: SupplierSerializer},
+        responses={200: SupplierUpdateSerializer},
         tags=["2.Поставщики"],
         manual_parameters=[
             openapi.Parameter(
