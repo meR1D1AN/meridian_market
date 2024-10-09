@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Node, Product, Contact
+from .models import Node, Product, Contact, Supplier
 
 
 # Сериализатор для модели Contact (контактная информация)
@@ -20,20 +20,10 @@ class ProductSerializer(serializers.ModelSerializer):
 class SupplierSerializer(serializers.ModelSerializer):
     contact = ContactSerializer(read_only=True)
     product = ProductSerializer(many=True, read_only=True)
-    # supplier = (read_only=True)
 
     class Meta:
-        model = Node
-        fields = [
-            "id",
-            "name",
-            "type",
-            "contact",
-            "product",
-            "supplier",
-            "debt_to_supplier",
-            "created_at",
-        ]
+        model = Supplier
+        fields = "__all__"
 
 
 # Основной сериализатор для модели Node

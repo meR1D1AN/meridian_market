@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Node, Product, Contact
+from .models import Node, Product, Contact, Supplier
 
 
 @admin.register(Contact)
@@ -31,9 +31,11 @@ class NodeAdmin(admin.ModelAdmin):
 
     # Ссылка на поставщика
     def supplier_link(self, obj):
-        if obj.supplier:
+        if obj.supplier_node:
             return format_html(
-                '<a href="{}">{}</a>', obj.supplier.get_admin_url(), obj.supplier.name
+                '<a href="{}">{}</a>',
+                obj.supplier_node.get_admin_url(),
+                obj.supplier_node.name,
             )
         return "(Нет поставщика)"
 
@@ -50,3 +52,8 @@ class NodeAdmin(admin.ModelAdmin):
         return ", ".join([product.product_name for product in obj.product.all()])
 
     get_product.short_description = "Продукт"
+
+
+@admin.register(Supplier)
+class SupplierAdmin(admin.ModelAdmin):
+    list_display = ("name", "contact")

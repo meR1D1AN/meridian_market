@@ -53,7 +53,7 @@ class Product(models.Model):
         ordering = ["product_name"]
 
 
-class Node(models.Model):
+class BaseClass(models.Model):
     FACTORY = "factory"
     RETAIL_NETWORK = "retail_network"
     ENTREPRENEUR = "entrepreneur"
@@ -84,15 +84,6 @@ class Node(models.Model):
         related_name="nodes",
         blank=True,
     )
-    # Поставщик
-    supplier = models.ForeignKey(
-        "self",
-        on_delete=models.SET_NULL,
-        related_name="clients",
-        verbose_name="Поставщик",
-        help_text="Выберите поставщика",
-        **NULLABLE,
-    )
     # Задолженность перед поставщиком
     debt_to_supplier = models.DecimalField(
         max_digits=10,
@@ -113,6 +104,42 @@ class Node(models.Model):
         help_text="Выберите структуру",
     )
 
+
+class Supplier(BaseClass):
+    # Поставщик
+    supplier_parent = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        related_name="suppliers",
+        max_length=255,
+        verbose_name="Поставщик",
+        help_text="Укажите поставщика",
+        **NULLABLE,
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Поставщик"
+        verbose_name_plural = "Поставщики"
+        ordering = ["name"]
+
+    def get_admin_url(self):
+        return reverse("admin:network_supplier_change", args=[self.id])
+
+
+class Node(BaseClass):
+    # Поставщик
+    supplier_node = models.ForeignKey(
+        Supplier,
+        on_delete=models.SET_NULL,
+        verbose_name="Поставщик",
+        help_text="Выберите поставщика",
+        related_name="supplier_nodes",
+        **NULLABLE,
+    )
+
     class Meta:
         verbose_name = "Торговая сеть электроники"
         verbose_name_plural = "Торговые сети электроники"
@@ -122,9 +149,14 @@ class Node(models.Model):
         return f"{self.name} ({self.get_type_display()})"
 
     def get_admin_url(self):
-        return reverse("admin:network_node_change", args=[self.id])
+        return reverse("admin:network_supplier_node_change", args=[self.id])
 
     def save(self, *args, **kwargs):
         if self.debt_to_supplier < 0:
             raise ValueError("Задолженность не может быть отрицательной.")
+        elif (
+            self.supplier_node
+            and not Supplier.objects.filter(id=self.supplier_node.id).exists()
+        ):
+            raise ValueError("Выбранный поставщик не существует.")
         super().save(*args, **kwargs)
