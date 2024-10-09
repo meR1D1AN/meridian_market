@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 
 NULLABLE = {"null": True, "blank": True}
 
@@ -53,10 +52,10 @@ class Product(models.Model):
         ordering = ["product_name"]
 
 
-class BaseClass(models.Model):
-    FACTORY = "factory"
-    RETAIL_NETWORK = "retail_network"
-    ENTREPRENEUR = "entrepreneur"
+class Node(models.Model):
+    FACTORY = 0
+    RETAIL_NETWORK = 1
+    ENTREPRENEUR = 2
 
     NODE_TYPES = [
         (FACTORY, "Завод"),
@@ -66,6 +65,12 @@ class BaseClass(models.Model):
     # Название
     name = models.CharField(
         max_length=255, verbose_name="Название", help_text="Укажите название"
+    )
+    # Уровень структуры
+    level = models.IntegerField(
+        choices=NODE_TYPES,
+        verbose_name="Уровень сети",
+        help_text="Выберете уровень сети",
     )
     # Контакты
     contact = models.ForeignKey(
@@ -82,7 +87,14 @@ class BaseClass(models.Model):
         verbose_name="Продукты",
         help_text="Укажите продукт",
         related_name="%(class)s_products",
-        blank=True,
+    )
+    supplier = models.ForeignKey(
+        "Node",
+        on_delete=models.SET_NULL,
+        verbose_name="Поставщик",
+        help_text="Укажите поставщика",
+        # related_name="%(class)s_suppliers",
+        **NULLABLE,
     )
     # Задолженность перед поставщиком
     debt_to_supplier = models.DecimalField(
@@ -98,87 +110,10 @@ class BaseClass(models.Model):
         verbose_name="Дата и время создания",
         **NULLABLE,
     )
-    # Уровень структуры
-    type = models.CharField(
-        max_length=20,
-        choices=NODE_TYPES,
-        verbose_name="Структура",
-        help_text="Выберите структуру",
-    )
 
     def __str__(self):
-        return f"{self.name} - ({self.get_type_display()})"
-
-    # Метод для вычисления уровня
-    def get_hierarchy_level(self):
-        level = 0
-        supplier = getattr(self, "supplier_node", None) or getattr(
-            self, "supplier_parent", None
-        )
-        while supplier:
-            level += 1
-            supplier = getattr(supplier, "supplier_node", None) or getattr(
-                supplier, "supplier_parent", None
-            )
-        return level
-
-    def save(self, *args, **kwargs):
-        if self.debt_to_supplier < 0:
-            raise ValueError("Задолженность не может быть отрицательной.")
-
-        # Проверяем наличие поставщика, но учитываем обе возможные модели: Supplier и Node
-        supplier_field = getattr(self, "supplier_node", None) or getattr(
-            self, "supplier_parent", None
-        )
-
-        if (
-            supplier_field
-            and not Supplier.objects.filter(id=supplier_field.id).exists()
-        ):
-            raise ValueError("Выбранный поставщик не существует.")
-
-        super().save(*args, **kwargs)
-
-
-class Supplier(BaseClass):
-    # Поставщик
-    supplier_parent = models.ForeignKey(
-        "self",
-        on_delete=models.SET_NULL,
-        related_name="suppliers",
-        max_length=255,
-        verbose_name="Поставщик",
-        help_text="Укажите поставщика",
-        **NULLABLE,
-    )
-
-    def __str__(self):
-        return self.name
+        return f"{self.name} - ({self.get_level_display()})"
 
     class Meta:
-        verbose_name = "Поставщик"
-        verbose_name_plural = "Поставщики"
-        ordering = ["name"]
-
-    def get_admin_url(self):
-        return reverse("admin:network_supplier_change", args=[self.id])
-
-
-class Node(BaseClass):
-    # Поставщик
-    supplier_node = models.ForeignKey(
-        Supplier,
-        on_delete=models.SET_NULL,
-        verbose_name="Поставщик",
-        help_text="Выберите поставщика",
-        related_name="supplier_nodes",
-        **NULLABLE,
-    )
-
-    class Meta:
-        verbose_name = "Торговая сеть электроники"
-        verbose_name_plural = "Торговые сети электроники"
-        ordering = ["name"]
-
-    def __str__(self):
-        return f"{self.name} ({self.get_type_display()})"
+        verbose_name = "Звено сети"
+        verbose_name_plural = "Звенья сети"

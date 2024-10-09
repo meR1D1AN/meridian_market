@@ -5,102 +5,9 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .filters import NodeFilter
-from .models import Node, Supplier
+
+from .models import Node
 from .serializers import NodeSerializer
-from .serializers import SupplierSerializer
-
-
-class SupplierViewSet(viewsets.ModelViewSet):
-    queryset = Supplier.objects.all()
-    permission_classes = [IsAuthenticated]
-    serializer_class = SupplierSerializer
-
-    @swagger_auto_schema(
-        operation_description="Создание нового поставщика",
-        responses={200: openapi.Response("OK", SupplierSerializer())},
-        tags=["2.Поставщики"],
-    )
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        operation_description="Получить список всех поставщиков",
-        responses={200: openapi.Response("OK", SupplierSerializer(many=True))},
-        tags=["2.Поставщики"],
-    )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        operation_description="Получить информацию о поставщике",
-        responses={200: SupplierSerializer},
-        tags=["2.Поставщики"],
-        manual_parameters=[
-            openapi.Parameter(
-                name="id",
-                in_=openapi.IN_PATH,
-                type=openapi.TYPE_INTEGER,
-                description="Укажите ID поставщика",
-            )
-        ],
-    )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        operation_description="Обновить информацию о поставщике",
-        responses={200: SupplierSerializer},
-        tags=["2.Поставщики"],
-        manual_parameters=[
-            openapi.Parameter(
-                name="id",
-                in_=openapi.IN_PATH,
-                type=openapi.TYPE_INTEGER,
-                description="Укажите ID поставщика",
-            )
-        ],
-    )
-    def update(self, request, *args, **kwargs):
-        # Проверяем, пытается ли пользователь обновить поле debt_to_supplier
-        if "debt_to_supplier" in request.data:
-            raise ValidationError("Обновление поля 'debt_to_supplier' запрещено.")
-        return super().update(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        operation_description="Частичное обновление информации о поставщике",
-        responses={200: SupplierSerializer},
-        tags=["2.Поставщики"],
-        manual_parameters=[
-            openapi.Parameter(
-                name="id",
-                in_=openapi.IN_PATH,
-                type=openapi.TYPE_INTEGER,
-                description="Укажите ID поставщика",
-            )
-        ],
-    )
-    def partial_update(self, request, *args, **kwargs):
-        # Проверяем, пытается ли пользователь обновить поле debt_to_supplier
-        if "debt_to_supplier" in request.data:
-            raise ValidationError("Обновление поля 'debt_to_supplier' запрещено.")
-        return super().partial_update(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        operation_description="Удалить поставщика",
-        responses={204: None},
-        tags=["2.Поставщики"],
-        manual_parameters=[
-            openapi.Parameter(
-                name="id",
-                in_=openapi.IN_PATH,
-                type=openapi.TYPE_INTEGER,
-                description="Укажите ID поставщика",
-            )
-        ],
-    )
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
 
 
 class NodeViewSet(viewsets.ModelViewSet):
@@ -108,11 +15,10 @@ class NodeViewSet(viewsets.ModelViewSet):
     serializer_class = NodeSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filter_class = NodeFilter
     filterset_fields = ["contact__country"]
 
     @swagger_auto_schema(
-        operation_description="Получить список всех тоговых сетей",
+        operation_description="Получить список всех звеньев сети",
         responses={200: openapi.Response("OK", NodeSerializer(many=True))},
         tags=["1. Торговые сети"],
         manual_parameters=[

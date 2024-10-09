@@ -1,11 +1,14 @@
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import NodeViewSet
-from .views import SupplierViewSet
+from rest_framework.routers import SimpleRouter
 
-router = DefaultRouter()
+from .apps import NetworkConfig
+from .views import NodeViewSet
+
+app_name = NetworkConfig.name
+
+
+router = SimpleRouter()
 router.register(r"nodes", NodeViewSet, basename="nodes")
-router.register(r"suppliers", SupplierViewSet, basename="suppliers")
 
 urlpatterns = [
     path("", include(router.urls)),
