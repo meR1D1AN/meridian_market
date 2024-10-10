@@ -1,8 +1,8 @@
 from django.core.management import BaseCommand
-from django.contrib.auth import get_user_model
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from users.models import User
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -14,12 +14,11 @@ class Command(BaseCommand):
     help = "Создание учётки админа"
 
     def handle(self, *args, **options):
-        User = get_user_model()
-        user = User.objects.create_superuser(
-            username="admin",
-            first_name="Admin",
+        user = User.objects.create(
             email=os.getenv("ADMIN_EMAIL"),
             is_active=True,
-            password=os.getenv("ADMIN_PASS"),
+            is_staff=True,
+            is_superuser=True,
         )
+        user.set_password(os.getenv("ADMIN_PASS"))
         user.save()

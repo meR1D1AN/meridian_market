@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -21,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Приложения проекта
     "network",
+    "users",
     # Сторонние библиотеки
     "rest_framework",
     "django_filters",
@@ -109,6 +111,14 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",  # Поддержка фильтрации в API
     ],
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",  # Авторизация по JWT
+    ),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
 # Swagger настройки
@@ -118,3 +128,5 @@ SWAGGER_SETTINGS = {
 }
 
 LOGIN_URL = "admin:login"
+
+AUTH_USER_MODEL = "users.User"
