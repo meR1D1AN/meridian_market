@@ -21,7 +21,17 @@ class NodeSerializer(serializers.ModelSerializer):
     contact = ContactSerializer(read_only=True)
     product = ProductSerializer(many=True, read_only=True)
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    supplier = serializers.CharField(read_only=True)
 
     class Meta:
         model = Node
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "level",
+            "contact",
+            "product",
+            "supplier",
+            "debt_to_supplier",
+            "created_at",
+        ]

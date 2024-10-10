@@ -15,17 +15,16 @@ class NodeViewSet(viewsets.ModelViewSet):
     serializer_class = NodeSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["contact__country"]
 
     @swagger_auto_schema(
         operation_description="Получить список всех звеньев сети",
         responses={200: openapi.Response("OK", NodeSerializer(many=True))},
-        tags=["1. Торговые сети"],
+        tags=["Звенья сети"],
         manual_parameters=[
             openapi.Parameter(
-                "country",
+                "city",
                 openapi.IN_QUERY,
-                description="Фильтр по стране",
+                description="Фильтр по городу",
                 type=openapi.TYPE_STRING,
                 required=False,
             )
@@ -35,25 +34,23 @@ class NodeViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_description="""
-        Создание новой торговой сети
-        """,
+        operation_description="Создание звена сети",
         responses={200: openapi.Response("OK", NodeSerializer())},
-        tags=["1. Торговые сети"],
+        tags=["Звенья сети"],
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_description="Получить информацию о торговой сети",
+        operation_description="Получить информацию о звене сети",
         responses={200: NodeSerializer},
-        tags=["1. Торговые сети"],
+        tags=["Звенья сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
                 in_=openapi.IN_PATH,
                 type=openapi.TYPE_INTEGER,
-                description="Укажите ID торговой сети",
+                description="Укажите ID звена сети",
             ),
         ],
     )
@@ -61,15 +58,15 @@ class NodeViewSet(viewsets.ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_description="Обновить информацию о торговой сети",
+        operation_description="Обновить информацию о звене сети",
         responses={200: NodeSerializer},
-        tags=["1. Торговые сети"],
+        tags=["Звенья сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
                 in_=openapi.IN_PATH,
                 type=openapi.TYPE_INTEGER,
-                description="Укажите ID торговой сети",
+                description="Укажите ID звена сети",
             ),
         ],
     )
@@ -80,15 +77,15 @@ class NodeViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_description="Частичное обновление информации о торговой сети",
+        operation_description="Частичное обновление информации о звене сети",
         responses={200: NodeSerializer},
-        tags=["1. Торговые сети"],
+        tags=["Звенья сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
                 in_=openapi.IN_PATH,
                 type=openapi.TYPE_INTEGER,
-                description="Укажите ID торговой сети",
+                description="Укажите ID звена сети",
             ),
         ],
     )
@@ -99,15 +96,15 @@ class NodeViewSet(viewsets.ModelViewSet):
         return super().partial_update(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        operation_description="Удалить торговую сеть",
+        operation_description="Удалить звено сети",
         responses={204: None},
-        tags=["1. Торговые сети"],
+        tags=["Звенья сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
                 in_=openapi.IN_PATH,
                 type=openapi.TYPE_INTEGER,
-                description="Укажите ID торговой сети",
+                description="Укажите ID звена сети",
             ),
         ],
     )

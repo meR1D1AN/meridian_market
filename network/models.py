@@ -93,7 +93,6 @@ class Node(models.Model):
         on_delete=models.SET_NULL,
         verbose_name="Поставщик",
         help_text="Укажите поставщика",
-        # related_name="%(class)s_suppliers",
         **NULLABLE,
     )
     # Задолженность перед поставщиком
@@ -112,7 +111,7 @@ class Node(models.Model):
     )
 
     def __str__(self):
-        return f"{self.name} - ({self.get_level_display()})"
+        return f"{self.name} - ({self.get_level_display()} уровень)"
 
     class Meta:
         verbose_name = "Звено сети"

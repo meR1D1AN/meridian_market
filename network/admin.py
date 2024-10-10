@@ -4,7 +4,7 @@ from .models import Node, Product, Contact
 
 # Action для обнуления задолженности
 @admin.action(description="Очистить задолженность перед поставщиком")
-def clear_debt(self, request, queryset):
+def clear_debt(modeladmin, request, queryset):
     queryset.update(debt_to_supplier=0)
 
 
@@ -32,9 +32,12 @@ class NodeAdmin(admin.ModelAdmin):
         "debt_to_supplier",
         "created_at",
     )
-    list_display_links = ["name", "supplier"]
+    list_display_links = ["supplier"]
+    # Фильтрация по городу
     list_filter = ("contact__city",)
+    # Поиск по имени звена сети
     search_fields = ("name",)
+    # Кнопка "Очистить задолженность перед поставщиком"
     actions = [clear_debt]
 
     def get_product(self, obj):
