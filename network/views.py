@@ -4,8 +4,6 @@ from rest_framework import viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
-
-
 from .models import Node
 from .serializers import NodeSerializer
 
@@ -19,7 +17,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Получить список всех звеньев сети",
         responses={200: openapi.Response("OK", NodeSerializer(many=True))},
-        tags=["Звенья сети"],
+        tags=["3. Звенья сети"],
         manual_parameters=[
             openapi.Parameter(
                 "city",
@@ -36,7 +34,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Создание звена сети",
         responses={200: openapi.Response("OK", NodeSerializer())},
-        tags=["Звенья сети"],
+        tags=["3. Звенья сети"],
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
@@ -44,7 +42,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Получить информацию о звене сети",
         responses={200: NodeSerializer},
-        tags=["Звенья сети"],
+        tags=["3. Звенья сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -60,7 +58,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Обновить информацию о звене сети",
         responses={200: NodeSerializer},
-        tags=["Звенья сети"],
+        tags=["3. Звенья сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -79,7 +77,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Частичное обновление информации о звене сети",
         responses={200: NodeSerializer},
-        tags=["Звенья сети"],
+        tags=["3. Звенья сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",
@@ -98,7 +96,7 @@ class NodeViewSet(viewsets.ModelViewSet):
     @swagger_auto_schema(
         operation_description="Удалить звено сети",
         responses={204: None},
-        tags=["Звенья сети"],
+        tags=["3. Звенья сети"],
         manual_parameters=[
             openapi.Parameter(
                 name="id",

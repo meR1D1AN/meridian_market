@@ -123,6 +123,7 @@ SIMPLE_JWT = {
 
 # Swagger настройки
 SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": False,
     "OPERATIONS_SORTER": "alpha",
     "TAGS_SORTER": "alpha",  # Сортировка тегов по алфавиту
 }
